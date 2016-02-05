@@ -110,7 +110,23 @@ EOF
 
 cat > /tmp/webserver.json << EOF
 {
-    "classes": [ "apache" ]
+    "classes": [ "apache", "webpage" ]
+}
+EOF
+
+cat > /tmp/index.html.erb << EOF
+Welcome to server <%=@fqdn%> <br/>     
+<br/>
+The role of this server is <%=@role%><br/>
+It's in the datacenter <%=@datacenter%><br/>
+It's for the environment <%=@env%><br/>
+EOF
+
+cat > /tmp/webpage_init.pp << EOF
+class webpage() {
+  file { '/var/www/html/index.html':
+    content => template('webpage/index.html.erb')
+  }
 }
 EOF
 
@@ -127,11 +143,13 @@ sed -ie 's/START=no/START=yes/g' /etc/default/puppet && \\
 sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf && \\
 git clone https://github.com/ersiko/facts-puppet-module.git  && \\
 mv facts-puppet-module /etc/puppet/modules/facts  && \\
-puppet module install ersiko-facts  && \\
 puppet module install puppetlabs-apache && \\
 mkdir -p /etc/puppet/data/role && \\
 mv /tmp/common.json /etc/puppet/data/ && \\
 mv /tmp/webserver.json /etc/puppet/data/role/ && \\
+mkdir -p /etc/puppet/modules/webpage/manifests/ /etc/puppet/modules/webpage/templates/  && \\
+mv /tmp/webpage_init.pp /etc/puppet/modules/webpage/manifests/init.pp && \\
+mv /tmp/index.html.erb /etc/puppet/modules/webpage/templates/  && \\
 chown puppet /etc/puppet/data && \\
 echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp && \\
 reboot
