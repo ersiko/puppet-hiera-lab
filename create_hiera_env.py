@@ -34,6 +34,10 @@ PUPPET_USER_DATA       = """#!/bin/bash
 wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb 
 dpkg -i /tmp/puppetlabs-release-trusty.deb
 
+# Adding some lines to rc.local to run "apt-get update", "configure-pat.sh" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
+sed -ie 's/^exit 0/apt-get update\\n# Configure PAT\\n\/usr\/local\/sbin\/configure-pat.sh\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
+/etc/rc.local
+
 # Enabling "noninteractive" so apt can install packages without questions
 export DEBIAN_FRONTEND=noninteractive
 
@@ -41,22 +45,18 @@ export DEBIAN_FRONTEND=noninteractive
 #apt-get dist-upgrade -y 
 
 # Installing basic stuff
-apt-get install -y joe puppet git puppetmaster whois && \\
+apt-get install -y joe puppet git puppetmaster whois
 
 # Cloning github lab repo
-git clone https://github.com/ersiko/puppet-hiera-lab.git  && \\
-
-# Adding some lines to rc.local to run "apt-get update", "configure-pat.sh" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
-sed -ie 's/^exit 0/apt-get update\\n# Configure PAT\\n\/usr\/local\/sbin\/configure-pat.sh\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
-/etc/rc.local
+git clone https://github.com/ersiko/puppet-hiera-lab.git 
 
 # Copying puppet configuration
 cp -a puppet-hiera-lab/puppet-config/* /etc/puppet/. 
 
 # Enabling puppet master start and cert autosigning
-sed -ie 's/START=no/START=yes/g' /etc/default/puppet && \\
-sed -ie 's/\[master\]/\[master\]\\nautosign = true/g' /etc/puppet/puppet.conf && \\
-sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf && \\
+sed -ie 's/START=no/START=yes/g' /etc/default/puppet
+sed -ie 's/\[master\]/\[master\]\\nautosign = true/g' /etc/puppet/puppet.conf 
+sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf 
 
 # Copying configure-pat.sh and set-hostname.sh and setting them u+x
 cp -a puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
@@ -87,38 +87,33 @@ reboot
 
 WEBSERVER_NAME            = "webserver"
 WEBSERVER_USER_DATA       = """#!/bin/bash
-# Installing puppet repo 
-wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb 
-dpkg -i /tmp/puppetlabs-release-trusty.deb
-
-cat > /usr/local/sbin/set-hostname.sh  << EOF
-#!/bin/bash
-
-localip=\`ip -o -4 a s | awk -F'[ /]+' '\$2!~/lo/{print \$4}'\`
-[ -z "\`grep \$localip /etc/hosts\`" ] && echo -e "\\n\$localip \$1 \${1%%.*}" >> /etc/hosts
-EOF
-chmod u+x /usr/local/sbin/set-hostname.sh
-
-# Adding some lines to rc.local to run "apt-get update" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
-sed -ie 's/^exit 0/apt-get update\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
-/etc/rc.local
 
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME  > /etc/hostname
 echo PUT_HERE_THE_PUPPET_MASTER_IP PUT_HERE_THE_PUPPET_MASTER_NAME >> /etc/hosts
 
+
+# Adding some lines to rc.local to run "apt-get update" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
+sed -ie 's/^exit 0/apt-get update\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
+/etc/rc.local
+
+
 # Enabling "noninteractive" so apt can install packages without questions
 export DEBIAN_FRONTEND=noninteractive
 
-# Upgrading all packages (takes a loooooong time, that's why it's commented out)
-#apt-get dist-upgrade -y 
-
 # Puppetmaster will reboot eventually, and that may break this installation. We don't want that to happen
 while [ ! -e /etc/puppet/puppet.conf ];do 
-  # Upgrading all packages (takes a loooooong time, that's why it's commented out)
-  #apt-get dist-upgrade -y
-  # Installing basic stuff
-  apt-get install -y joe puppet git
+    /etc/rc.local && \\ 
+    # Downloading the "set-hostname.sh" script && \\ 
+    wget https://raw.githubusercontent.com/ersiko/puppet-hiera-lab/master/auxfiles/set-hostname.sh -O /usr/local/sbin/set-hostname.sh && \\
+    chmod u+x /usr/local/sbin/set-hostname.sh && \\
+    # Installing puppet repo  && \\ 
+    wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb  && \\ 
+    dpkg -i /tmp/puppetlabs-release-trusty.deb && \\ 
+    # Upgrading all packages (takes a loooooong time, that's why it's commented out) && \\ 
+    #apt-get dist-upgrade -y && \\ 
+    # Installing basic stuff && \\ 
+    apt-get install -y joe puppet git
 done 
 
 # Configuring puppet, setting query interval to 30 seconds, and setting the puppet master server name and then making puppet start at boot
@@ -254,7 +249,7 @@ elasticip = vpc_con.allocate_address(domain='vpc')
 print("Associating elasticip to puppetmaster instance")
 vpc_con.associate_address(instance_id=puppetmaster.id, allocation_id=elasticip.allocation_id)
 
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80"
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80")
 # -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i my-ec2-key.pem")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i my-ec2-key.pem")
