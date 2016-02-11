@@ -6,4 +6,5 @@
 :hierarchy:
   - "hosts/%{fqdn}"
   - "role/%{role}"
+  - "datacenter/%{datacenter}"
   - common
