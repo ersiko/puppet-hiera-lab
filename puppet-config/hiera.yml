@@ -1,0 +1,9 @@
+---
+:backends:
+  - json
+:json:
+  :datadir: /etc/puppet/data
+:hierarchy:
+  - "hosts/%{fqdn}"
+  - "role/%{role}"
+  - common

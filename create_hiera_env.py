@@ -30,134 +30,67 @@ MYSQL_NAME     = 'mysql'
 
 PUPPET_NAME            = "puppetmaster"
 PUPPET_USER_DATA       = """#!/bin/bash
-cat > /usr/local/sbin/set-hostname.sh  << EOF
-#!/bin/bash
-
-localip=\`ip -o -4 a s | awk -F'[ /]+' '\$2!~/lo/{print \$4}'\`
-[ -z "\`grep \$localip /etc/hosts\`" ] && echo -e "\\n\$localip \$1 \${1%%.*}" >> /etc/hosts
-EOF
-chmod u+x /usr/local/sbin/set-hostname.sh
-
-cat > /usr/local/sbin/configure-pat.sh << EOF
-#!/bin/bash
-# Configure the instance to run as a Port Address Translator (PAT) to provide
-# Internet connectivity to private instances.
-
-function log { logger -t "vpc" -- \$1; }
-
-function die {
-    [ -n "\$1" ] && log "\$1"
-    log "Configuration of PAT failed!"
-    exit 1
-}
-
-# Sanitize PATH
-PATH="/usr/sbin:/sbin:/usr/bin:/bin"
-
-log "Determining the MAC address on eth0..."
-ETH0_MAC=\$(cat /sys/class/net/eth0/address) ||
-    die "Unable to determine MAC address on eth0."
-log "Found MAC \${ETH0_MAC} for eth0."
-
-VPC_CIDR_URI="http://169.254.169.254/latest/meta-data/network/interfaces/macs/\${ETH0_MAC}/vpc-ipv4-cidr-block"
-log "Metadata location for vpc ipv4 range: \${VPC_CIDR_URI}"
-
-VPC_CIDR_RANGE=\$(curl --retry 3 --silent --fail \${VPC_CIDR_URI})
-if [ \$? -ne 0 ]; then
-   log "Unable to retrive VPC CIDR range from meta-data, using 0.0.0.0/0 instead. PAT may masquerade traffic for Internet hosts!"
-   VPC_CIDR_RANGE="0.0.0.0/0"
-else
-   log "Retrieved VPC CIDR range \${VPC_CIDR_RANGE} from meta-data."
-fi
-
-log "Enabling PAT..."
-sysctl -q -w net.ipv4.ip_forward=1 net.ipv4.conf.eth0.send_redirects=0 && (
-   iptables -t nat -C POSTROUTING -o eth0 -s \${VPC_CIDR_RANGE} -j MASQUERADE 2> /dev/null ||
-   iptables -t nat -A POSTROUTING -o eth0 -s \${VPC_CIDR_RANGE} -j MASQUERADE ) ||
-       die
-
-sysctl net.ipv4.ip_forward net.ipv4.conf.eth0.send_redirects | log
-iptables -n -t nat -L POSTROUTING | log
-
-log "Configuration of PAT complete."
-exit 0
-EOF
+# Installing puppet repo 
 wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb 
 dpkg -i /tmp/puppetlabs-release-trusty.deb
 
-chmod u+x /usr/local/sbin/configure-pat.sh
+# Enabling "noninteractive" so apt can install packages without questions
+export DEBIAN_FRONTEND=noninteractive
+
+# Upgrading all packages (takes a loooooong time, that's why it's commented out)
+#apt-get dist-upgrade -y 
+
+# Installing basic stuff
+apt-get install -y joe puppet git puppetmaster whois && \\
+
+# Cloning github lab repo
+git clone https://github.com/ersiko/puppet-hiera-lab.git  && \\
+
+# Adding some lines to rc.local to run "apt-get update", "configure-pat.sh" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
 sed -ie 's/^exit 0/apt-get update\\n# Configure PAT\\n\/usr\/local\/sbin\/configure-pat.sh\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
 /etc/rc.local
 
-cat > /tmp/hiera.yaml << EOF
----
-:backends:
-  - json
-:json:
-  :datadir: /etc/puppet/data
-:hierarchy:
-  - "hosts/%{fqdn}"
-  - "role/%{role}"
-  - common
-EOF
+# Copying puppet configuration
+cp -a puppet-hiera-lab/puppet-config/* /etc/puppet/. 
 
+# Enabling puppet master start and cert autosigning
+sed -ie 's/START=no/START=yes/g' /etc/default/puppet && \\
+sed -ie 's/\[master\]/\[master\]\\nautosign = true/g' /etc/puppet/puppet.conf && \\
+sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf && \\
 
-cat > /tmp/common.json << EOF
-{
-    "classes": [ "facts" ]
-}
-EOF
+# Copying configure-pat.sh and set-hostname.sh and setting them u+x
+cp -a puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
+chmod u+x /usr/local/sbin/set-hostname.sh  
+chmod u+x /usr/local/sbin/configure-pat.sh  
 
-cat > /tmp/webserver.json << EOF
-{
-    "classes": [ "apache", "webpage" ]
-}
-EOF
+# Installing puppetlabs apache module
+puppet module install puppetlabs-apache 
 
-cat > /tmp/index.html.erb << EOF
-Welcome to server <%=@fqdn%> <br/>     
-<br/>
-The role of this server is <%=@role%><br/>
-It's in the datacenter <%=@datacenter%><br/>
-It's for the environment <%=@env%><br/>
-EOF
-
-cat > /tmp/webpage_init.pp << EOF
-class webpage() {
-  file { '/var/www/html/index.html':
-    content => template('webpage/index.html.erb')
-  }
-}
-EOF
-
+# Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
 echo PUT_HERE_THE_PUPPET_MASTER_IP PUT_HERE_THE_PUPPET_MASTER_NAME >> /etc/hosts
-export DEBIAN_FRONTEND=noninteractive
-#apt-get dist-upgrade -y && \\
-apt-get install -y joe puppet git puppetmaster whois && \\
-mv /tmp/hiera.yaml /etc/puppet/hiera.yaml && \\
-rm /etc/hiera.yaml && \\
-ln -s /etc/puppet/hiera.yaml /etc/hiera.yaml && \\
-sed -ie 's/\[master\]/\[master\]\\nautosign = true/g' /etc/puppet/puppet.conf && \\
-sed -ie 's/START=no/START=yes/g' /etc/default/puppet && \\
-sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf && \\
-git clone https://github.com/ersiko/facts-puppet-module.git  && \\
-mv facts-puppet-module /etc/puppet/modules/facts  && \\
-puppet module install puppetlabs-apache && \\
-mkdir -p /etc/puppet/data/role && \\
-mv /tmp/common.json /etc/puppet/data/ && \\
-mv /tmp/webserver.json /etc/puppet/data/role/ && \\
-mkdir -p /etc/puppet/modules/webpage/manifests/ /etc/puppet/modules/webpage/templates/  && \\
-mv /tmp/webpage_init.pp /etc/puppet/modules/webpage/manifests/init.pp && \\
-mv /tmp/index.html.erb /etc/puppet/modules/webpage/templates/  && \\
-chown puppet /etc/puppet/data && \\
-echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp && \\
+
+# Linking /etc/hiera.yaml to /etc/puppet/hiera.yaml
+rm /etc/hiera.yaml
+ln -s /etc/puppet/hiera.yaml /etc/hiera.yaml
+
+# Adding hiera config to puppet
+echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp 
+
+# Make puppet data owned by puppet
+chown puppet /etc/puppet/data 
+
+# And wrapping all up with a reboot
 reboot
 """
 
 
 WEBSERVER_NAME            = "webserver"
 WEBSERVER_USER_DATA       = """#!/bin/bash
+# Installing puppet repo 
+wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb 
+dpkg -i /tmp/puppetlabs-release-trusty.deb
+
 cat > /usr/local/sbin/set-hostname.sh  << EOF
 #!/bin/bash
 
@@ -166,19 +99,34 @@ localip=\`ip -o -4 a s | awk -F'[ /]+' '\$2!~/lo/{print \$4}'\`
 EOF
 chmod u+x /usr/local/sbin/set-hostname.sh
 
-wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb 
-dpkg -i /tmp/puppetlabs-release-trusty.deb
+# Adding some lines to rc.local to run "apt-get update" and "set-hostname.sh" to be ran every time the server starts. And actually running all of it now.
 sed -ie 's/^exit 0/apt-get update\\n\/usr\/local\/sbin\/set-hostname.sh PUT_HERE_THE_SERVER_NAME\\nexit 0/g' /etc/rc.local
 /etc/rc.local
+
+# Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME  > /etc/hostname
 echo PUT_HERE_THE_PUPPET_MASTER_IP PUT_HERE_THE_PUPPET_MASTER_NAME >> /etc/hosts
+
+# Enabling "noninteractive" so apt can install packages without questions
 export DEBIAN_FRONTEND=noninteractive
-while [ ! -e /etc/puppet/puppet.conf ];do apt-get update && \\
-#apt-get dist-upgrade -y && \\
-apt-get install -y joe puppet git puppet;done 
-sed -ie 's/\[main\]/\[main\]\\nserver=PUT_HERE_THE_PUPPET_MASTER_NAME\\nruninterval=30/g' /etc/puppet/puppet.conf && \\
-sed -ie 's/START=no/START=yes/g' /etc/default/puppet && \\
-sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf && \\
+
+# Upgrading all packages (takes a loooooong time, that's why it's commented out)
+#apt-get dist-upgrade -y 
+
+# Puppetmaster will reboot eventually, and that may break this installation. We don't want that to happen
+while [ ! -e /etc/puppet/puppet.conf ];do 
+  # Upgrading all packages (takes a loooooong time, that's why it's commented out)
+  #apt-get dist-upgrade -y
+  # Installing basic stuff
+  apt-get install -y joe puppet git
+done 
+
+# Configuring puppet, setting query interval to 30 seconds, and setting the puppet master server name and then making puppet start at boot
+sed -ie 's/\[main\]/\[main\]\\nserver=PUT_HERE_THE_PUPPET_MASTER_NAME\\nruninterval=30/g' /etc/puppet/puppet.conf
+sed -ie 's/START=no/START=yes/g' /etc/default/puppet
+sed -ie 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf 
+
+# And wrapping all up with a reboot
 reboot
 """
 
@@ -268,37 +216,37 @@ dev=launch_instance(VPC_CON=vpc_con,
                     PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-stage=launch_instance(VPC_CON=vpc_con,
-                    INS_NAME=WEBSERVER1_STAGE_NAME,
-                    INS_USER_DATA=WEBSERVER_USER_DATA,
-                    INS_SECGROUPS=[secgroup.id],
-                    INS_SUBNET=subnetbe,
-                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+#stage=launch_instance(VPC_CON=vpc_con,
+#                    INS_NAME=WEBSERVER1_STAGE_NAME,
+#                    INS_USER_DATA=WEBSERVER_USER_DATA,
+#                    INS_SECGROUPS=[secgroup.id],
+#                    INS_SUBNET=subnetbe,
+#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-prod1=launch_instance(VPC_CON=vpc_con,
-                    INS_NAME=WEBSERVER1_PROD_NAME,
-                    INS_USER_DATA=WEBSERVER_USER_DATA,
-                    INS_SECGROUPS=[secgroup.id],
-                    INS_SUBNET=subnetbe,
-                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+#prod1=launch_instance(VPC_CON=vpc_con,
+#                    INS_NAME=WEBSERVER1_PROD_NAME,
+#                    INS_USER_DATA=WEBSERVER_USER_DATA,
+#                    INS_SECGROUPS=[secgroup.id],
+#                    INS_SUBNET=subnetbe,
+#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-prod2=launch_instance(VPC_CON=vpc_con,
-                    INS_NAME=WEBSERVER2_PROD_NAME,
-                    INS_USER_DATA=WEBSERVER_USER_DATA,
-                    INS_SECGROUPS=[secgroup.id],
-                    INS_SUBNET=subnetbe,
-                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+#prod2=launch_instance(VPC_CON=vpc_con,
+#                    INS_NAME=WEBSERVER2_PROD_NAME,
+#                    INS_USER_DATA=WEBSERVER_USER_DATA,
+#                    INS_SECGROUPS=[secgroup.id],
+#                    INS_SUBNET=subnetbe,
+#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 
 print("Creating dev webserver node instance(s) in VPC")
-prod1dc2=launch_instance(VPC_CON=vpc_con,
-                    INS_NAME=WEBSERVER1_PROD_DC2_NAME,
-                    INS_USER_DATA=WEBSERVER_USER_DATA,
-                    INS_SECGROUPS=[secgroup.id],
-                    INS_SUBNET=subnetbe,
-                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+#prod1dc2=launch_instance(VPC_CON=vpc_con,
+#                    INS_NAME=WEBSERVER1_PROD_DC2_NAME,
+#                    INS_USER_DATA=WEBSERVER_USER_DATA,
+#                    INS_SECGROUPS=[secgroup.id],
+#                    INS_SUBNET=subnetbe,
+#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 
 print("Creating elasticip")
@@ -306,7 +254,8 @@ elasticip = vpc_con.allocate_address(domain='vpc')
 print("Associating elasticip to puppetmaster instance")
 vpc_con.associate_address(instance_id=puppetmaster.id, allocation_id=elasticip.allocation_id)
 
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80"
+# -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i my-ec2-key.pem")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i my-ec2-key.pem")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i my-ec2-key.pem")
