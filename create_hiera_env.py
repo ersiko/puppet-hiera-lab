@@ -211,37 +211,37 @@ dev=launch_instance(VPC_CON=vpc_con,
                     PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-#stage=launch_instance(VPC_CON=vpc_con,
-#                    INS_NAME=WEBSERVER1_STAGE_NAME,
-#                    INS_USER_DATA=WEBSERVER_USER_DATA,
-#                    INS_SECGROUPS=[secgroup.id],
-#                    INS_SUBNET=subnetbe,
-#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+stage=launch_instance(VPC_CON=vpc_con,
+                    INS_NAME=WEBSERVER1_STAGE_NAME,
+                    INS_USER_DATA=WEBSERVER_USER_DATA,
+                    INS_SECGROUPS=[secgroup.id],
+                    INS_SUBNET=subnetbe,
+                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-#prod1=launch_instance(VPC_CON=vpc_con,
-#                    INS_NAME=WEBSERVER1_PROD_NAME,
-#                    INS_USER_DATA=WEBSERVER_USER_DATA,
-#                    INS_SECGROUPS=[secgroup.id],
-#                    INS_SUBNET=subnetbe,
-#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+prod1=launch_instance(VPC_CON=vpc_con,
+                    INS_NAME=WEBSERVER1_PROD_NAME,
+                    INS_USER_DATA=WEBSERVER_USER_DATA,
+                    INS_SECGROUPS=[secgroup.id],
+                    INS_SUBNET=subnetbe,
+                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 print("Creating dev webserver node instance(s) in VPC")
-#prod2=launch_instance(VPC_CON=vpc_con,
-#                    INS_NAME=WEBSERVER2_PROD_NAME,
-#                    INS_USER_DATA=WEBSERVER_USER_DATA,
-#                    INS_SECGROUPS=[secgroup.id],
-#                    INS_SUBNET=subnetbe,
-#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+prod2=launch_instance(VPC_CON=vpc_con,
+                    INS_NAME=WEBSERVER2_PROD_NAME,
+                    INS_USER_DATA=WEBSERVER_USER_DATA,
+                    INS_SECGROUPS=[secgroup.id],
+                    INS_SUBNET=subnetbe,
+                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 
 print("Creating dev webserver node instance(s) in VPC")
-#prod1dc2=launch_instance(VPC_CON=vpc_con,
-#                    INS_NAME=WEBSERVER1_PROD_DC2_NAME,
-#                    INS_USER_DATA=WEBSERVER_USER_DATA,
-#                    INS_SECGROUPS=[secgroup.id],
-#                    INS_SUBNET=subnetbe,
-#                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
+prod1dc2=launch_instance(VPC_CON=vpc_con,
+                    INS_NAME=WEBSERVER1_PROD_DC2_NAME,
+                    INS_USER_DATA=WEBSERVER_USER_DATA,
+                    INS_SECGROUPS=[secgroup.id],
+                    INS_SUBNET=subnetbe,
+                    PUPPET_MASTER_IP=puppetmaster.private_ip_address)
 
 
 print("Creating elasticip")
@@ -249,8 +249,7 @@ elasticip = vpc_con.allocate_address(domain='vpc')
 print("Associating elasticip to puppetmaster instance")
 vpc_con.associate_address(instance_id=puppetmaster.id, allocation_id=elasticip.allocation_id)
 
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80")
-# -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i my-ec2-key.pem")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i my-ec2-key.pem")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i my-ec2-key.pem")
