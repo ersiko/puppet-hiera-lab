@@ -103,13 +103,13 @@ export DEBIAN_FRONTEND=noninteractive
 
 # Puppetmaster will reboot eventually, and that may break this installation. We don't want that to happen
 while [ ! -e /etc/puppet/puppet.conf ];do 
-    /etc/rc.local && \\ 
     # Downloading the "set-hostname.sh" script && \\ 
     wget https://raw.githubusercontent.com/ersiko/puppet-hiera-lab/master/auxfiles/set-hostname.sh -O /usr/local/sbin/set-hostname.sh && \\
     chmod u+x /usr/local/sbin/set-hostname.sh && \\
     # Installing puppet repo  && \\ 
-    wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb  && \\ 
+    wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb -O /tmp/puppetlabs-release-trusty.deb && \\ 
     dpkg -i /tmp/puppetlabs-release-trusty.deb && \\ 
+    /etc/rc.local && \\ 
     # Upgrading all packages (takes a loooooong time, that's why it's commented out) && \\ 
     #apt-get dist-upgrade -y && \\ 
     # Installing basic stuff && \\ 
