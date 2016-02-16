@@ -1,6 +1,6 @@
 ---
 :backends:
-  - json
+  - yaml
 :json:
   :datadir: /etc/puppet/data
 :hierarchy:

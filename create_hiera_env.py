@@ -65,6 +65,7 @@ chmod u+x /usr/local/sbin/configure-pat.sh
 puppet module install puppetlabs-apache 
 puppet module install puppetlabs-ntp
 puppet module install puppetlabs-mysql
+puppet module install ghoneycutt-ssh
 
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
