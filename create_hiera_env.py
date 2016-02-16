@@ -49,10 +49,10 @@ apt-get install -y joe puppet git puppetmaster whois
 git clone https://github.com/ersiko/puppet-hiera-lab.git 
 
 # Copying puppet configuration
-cp -a puppet-hiera-lab/puppet-config/* /etc/puppet/.
-#cp -a /etc/puppet/* puppet-hiera-lab/puppet-config/.
-#mv /etc/puppet /etc/puppet.orig
-#ln -s /puppet-hiera-lab/puppet-config/ /etc/puppet
+#cp -a puppet-hiera-lab/puppet-config/* /etc/puppet/.
+cp -a /etc/puppet/* puppet-hiera-lab/puppet-config/.
+mv /etc/puppet /etc/puppet.orig
+ln -s /puppet-hiera-lab/puppet-config/ /etc/puppet
 
 # Enabling puppet master start and cert autosigning
 sed -i -e 's/START=no/START=yes/g' /etc/default/puppet

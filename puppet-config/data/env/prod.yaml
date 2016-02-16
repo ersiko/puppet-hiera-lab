@@ -3,8 +3,8 @@ ssh::keys:
     ensure: present
     user: root
     type: rsa
-    key: AAAA...THIS-IS-A-MOCK-KEY==
-  disable_root_for_devs:
+    key: AAAA...THIS-IS-A-PROD-MOCK-KEY==
+  root_for_devs:
     ensure: absent
     user: root
-    key: AAAA...THIS-IS-ANOTHER-MOCK-KEY==
+    key: AAAA...THIS-IS-DEV-MOCK-KEY==

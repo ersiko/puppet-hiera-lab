@@ -1,4 +1,4 @@
 classes:
   - facts
   - ntp
-  
+  - ssh
