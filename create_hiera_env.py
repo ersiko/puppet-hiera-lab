@@ -82,7 +82,7 @@ ln -s /etc/puppet/hiera.yaml /etc/hiera.yaml
 echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp 
 
 # Make puppet data owned by puppet
-chown puppet /etc/puppet/data 
+chown -R puppet /etc/puppet/data 
 
 # And wrapping all up with a reboot
 reboot
