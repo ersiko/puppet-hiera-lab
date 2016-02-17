@@ -1,6 +1,6 @@
-Facter.add("domain") do
+Facter.add("client") do
   setcode do
-    Facter.value('fqdn').split('.')[-1]
+    Facter.value('fqdn').split('.')[-2]
   end
 end
 
