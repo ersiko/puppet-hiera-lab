@@ -1,4 +1,0 @@
-{
-    "apache::service_ensure" : false,
-    "apache::service_enable" : false
-}
