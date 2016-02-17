@@ -4,8 +4,4 @@
 :yaml:
   :datadir: /etc/puppet/data
 :hierarchy:
-  - "hosts/%{fqdn}"
-  - "role/%{role}"
-  - "datacenter/%{datacenter}"
-  - "env/%{env}"
   - common

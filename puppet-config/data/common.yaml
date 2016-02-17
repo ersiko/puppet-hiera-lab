@@ -1,4 +1,3 @@
 classes:
   - facts
   - ntp
-  - ssh
