@@ -5,6 +5,7 @@
   :datadir: /etc/puppet/data
 :hierarchy:
   - "hosts/%{fqdn}"
+  - "datacenter/%{datacenter}/env/%{env}/role/%{role}"
   - "env/%{env}/role/%{role}"
   - "role/%{role}"
   - "datacenter/%{datacenter}"
