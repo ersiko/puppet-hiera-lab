@@ -1,3 +1,9 @@
+Facter.add("domain") do
+  setcode do
+    Facter.value('fqdn').split('.')[-1]
+  end
+end
+
 Facter.add('role') do
   setcode do
     hostname = Facter.value('hostname')
