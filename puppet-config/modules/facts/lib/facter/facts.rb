@@ -16,8 +16,12 @@ Facter.add('role') do
     when "client2"
       hostname = Facter.value('fqdn').split('.')[0][1..-1]    
       match = hostname.match /^(\D+)/        
-      role = match.captures[0]            
-      role                 
+      role = match.captures[0]
+      if role == 'web'
+        'webserver'
+      elsif role == 'db'
+        'mysql'
+      end                 
     end
   end  
 end  

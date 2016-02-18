@@ -25,7 +25,7 @@ WEBSERVER1_PROD_DC2_NAME = 'webserver1.us-west-1.prod.client1.com'
 WEBSERVER1_STAGE_NAME = 'webserver1.us-west-1.stage.client1.com'
 WEBSERVER1_DEV_NAME = 'webserver1.us-east-1.dev.client1.com'
 MYSQL1_PROD_NAME = 'mysql1.us-east-1.prod.client1.com'
-CLIENT2_NAME = 'pwebserver1.client2.com'
+CLIENT2_NAME = 'pweb1.client2.com'
 
 PUPPET_NAME            = "puppetmaster"
 PUPPET_USER_DATA       = """#!/bin/bash
@@ -70,6 +70,7 @@ puppet module install puppetlabs-apache
 puppet module install puppetlabs-ntp
 puppet module install puppetlabs-mysql
 puppet module install ghoneycutt-ssh
+puppet module install nodes-php
 
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
