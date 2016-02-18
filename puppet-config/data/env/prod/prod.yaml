@@ -1,0 +1,10 @@
+ssh::keys:
+  root_for_devops:
+    ensure: present
+    user: root
+    type: rsa
+    key: AAAA...THIS-IS-A-MOCK-KEY==
+  root_for_devs:
+    ensure: absent
+    user: root
+    key: AAAA...THIS-IS-ANOTHER-MOCK-KEY==

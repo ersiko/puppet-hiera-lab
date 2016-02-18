@@ -1,4 +1,6 @@
 classes:
   - apache
   - webpage
-  
+  - php::apache
+  - php::cli
+  - php::extension::mysql  
