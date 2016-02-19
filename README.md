@@ -15,19 +15,18 @@ You need to have installed in your computer:
 Then you'll need the "[create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py)" script
 
 Also, regarding AWS, you'll need:
-- an AWS account, and an "access_key" / "secret_access_key" pair, with ec2 and vpc privileges.
-- a ssh public / private key pair. You'll need to set the key name and key path inside the python script for it to work.
+- an AWS account, and an "access_key" / "secret_access_key" pair with ec2 and vpc privileges, set inside the exportenv.sh file.
+- a ssh public / private key pair. You'll need to set the key name and key path inside the exportenv.sh file.
 
 
-## Preparation
-After meeting the requirements and editing the python script adding your keys, you'll need to set two env variables for boto to work:
+# Preparation
+After meeting the requirements and editing the exportenv.sh script, simply run the command:
 
-    export AWS_ACCESS_KEY_ID=AKIAIHERATGRKJJ36VM2A
-    export AWS_SECRET_ACCESS_KEY=+TQYfjhtFJFSJ4jjaIRltDoQMyqtg5HKRxU4vGLBUpof
+    source exportenv.sh
 
 Then you can run the "[create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py)" script, and it'll create the needed aws instances.
 
-After all the instances are running, the script will output the lines you'll need to connect to all the servers. Just copy and paste that lines.
+After all the instances are running, the script will output the lines you'll need to connect to all the servers. Just copy and paste the lines.
 
 When you're done with your lab, don't forget to remove all the servers. There's another script for that: [delete_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/delete_hiera_env.py)
 
