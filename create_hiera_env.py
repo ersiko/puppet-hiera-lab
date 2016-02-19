@@ -3,6 +3,10 @@
 from boto import vpc
 import time
 
+KEY_NAME       = 'your-ec2-key' # put here the name of your key in amazon
+KEY_FILE       = '/path/to/your/ec2-key.pem' # put here the path to your key in the local computer
+
+
 amazon='ami-d22932be'
 ubuntu='ami-87564feb'
 redhat='ami-875042eb'
@@ -11,8 +15,6 @@ nat   ='ami-17273c7b'
 INSTANCE_TYPE  = 't2.micro'
 IMAGE          = ubuntu # Basic 64-bit Ubuntu AMI
 REGION         = 'eu-central-1' # If you change this, you'll need to change AMIs codes as well, as they're different for each region
-KEY_NAME       = 'my-ec2-key'
-KEY_FILE       = '/home/tomas/Baixades/my-ec2-key.pem'
 PROJECT        = 'Hiera-demo'
 SECURITY_GROUP = ['Hiera-demo']
 PUPPET_NAME    = 'puppetmaster'
