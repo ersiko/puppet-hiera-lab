@@ -100,12 +100,14 @@ Here we'll set the apache configurations. For now, we'll just apply the "apache"
 
 To access our data over http and confirm it's working, we'll create a webpage showing some info. That will be a simple module called "webpage", with this contents:
 - `/etc/puppet/modules/webpage/manifests/init.pp`:
-We'll add here the definition of the `/var/www/html/index.html` file with our custom facts. Also we'll be adding the "connection_string" so we can connect to our mysql server.
+We'll add here the definition of the `/var/www/html/index.html` file with our custom facts. 
+- `/etc/puppet/modules/webpage/templates/index.html.erb`:
+Text file containing our variables.
 
-
-
+At this point we can access our apache servers over http and check the information in them.
 
 ## Fifth step: Setting variables just for a particular host
+Our cluster of webservers was working ok, but one server started acting up! We want to take it out of the cluster ASAP, and continue with the other hosts, but we'd also like to investigate what's going on with this particular one. No problem! Hiera will help us with that.
 
 ## Sixth step: Mixing environment and role for variables
 
