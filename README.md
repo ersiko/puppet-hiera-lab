@@ -109,6 +109,15 @@ At this point we can access our apache servers over http and check the informati
 ## Fifth step: Setting variables just for a particular host
 Our cluster of webservers was working ok, but one server started acting up! We want to take it out of the cluster ASAP, and continue with the other hosts, but we'd also like to investigate what's going on with this particular one. No problem! Hiera will help us with that.
 
+To continue, in the puppet master, logged as root, type "5" just a plain number five) and it will checkout the proper git branch with the puppet configuration.
+
+No new puppet modules will be used for this step.
+
+This time we already have a useful facter for our purpose: fqdn. So the changes we'll made are:
+- `/etc/puppet/hiera.yaml`: 
+There's a new line for the host origin (remember to restart puppetmaster after changing hiera.xml file). This origin will usually be the first line in the hierarchy, as you don't want them to be overwritten by any other file. 
+
+
 ## Sixth step: Mixing environment and role for variables
 
 ## Seventh step: Mixing environment and datacenter and roles for variables
