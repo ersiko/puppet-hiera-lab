@@ -145,7 +145,7 @@ Now you can check all prod an dev servers how they get their own mysql server to
 ## Seventh step: Mixing environment and datacenter and roles for variables
 Our mysql server was a bit overloaded and it wasn't performing well on the cross-datacenter read queries, so we decided to spin up a read-replica in the same datacenter as the webservers. All write queries will still go to the mysql master, but the reads will be dramatically improved. How can we do that? Exactly the same way we've been doing it so far.
 
-To continue, in the puppet master, logged as root, type "6" just a plain number six) and it will checkout the proper git branch with the puppet configuration.
+To continue, in the puppet master, logged as root, type "7" just a plain number seven) and it will checkout the proper git branch with the puppet configuration.
 
 No new puppet modules will be used for this step.
 
@@ -160,7 +160,15 @@ And we can check now in the webpage how are they both connecting to different se
 ## Eighth step: How to control more than one client with the same puppet master
 Perfect! We have our modules and our configurations... great! Now I'd like to use all my effort in all the websites I'm managing. But they're all different clients, different domains and different name format... Could we add those servers to our puppet master? Yeah, of course!
 
-To continue, in the puppet master, logged as root, type "6" just a plain number six) and it will checkout the proper git branch with the puppet configuration.
+To continue, in the puppet master, logged as root, type "8" just a plain number six) and it will checkout the proper git branch with the puppet configuration.
 
 For this step we'll be using the puppet module "nodes-php". The last command (8) have already installed them for you.
 
+We'll add one new facter called "client", but not only that. As the name format is different (webserver1.prod.us-east1.client1.com vs pweb1.client2.com), we'll need to add some extra code to our existing facters to adapt to both formats, changing the following files:
+
+- `/etc/puppet/modules/facts/lib/facter/facts.rb`: 
+Here we're adding the "client" facter. Then we add some conditional statements so we extract the values from the fqdn in different ways for both clients.
+- `/etc/puppet/modules/facts/templates/factlist.erb`:
+Adding the new "client" facter to the "/etc/facts" file so we can confirm it's working.
+- `/etc/puppet/hiera.yaml`: 
+There's a new line for the client/role origin (remember to restart puppetmaster after changing hiera.xml file). 

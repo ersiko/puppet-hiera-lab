@@ -14,24 +14,24 @@ Facter.add('role') do
       role = match.captures[0]
       role
     when "client2"
-      hostname = Facter.value('fqdn').split('.')[0][1..-1]    
-      match = hostname.match /^(\D+)/        
+      hostname = Facter.value('fqdn').split('.')[0][1..-1]
+      match = hostname.match /^(\D+)/
       role = match.captures[0]
       if role == 'web'
         'webserver'
       elsif role == 'db'
         'mysql'
-      end                 
+      end
     end
-  end  
-end  
-   
+  end
+end
+
 Facter.add("datacenter") do
   setcode do
     Facter.value('fqdn').split('.')[-4]
   end
-end  
-   
+end
+
 Facter.add("env") do
   setcode do
     clientid = Facter.value("client")
@@ -45,7 +45,7 @@ Facter.add("env") do
         'dev'
       elsif Facter.value('fqdn').split('')[0] == 's'
         'stage'
-      end                                     
+      end
     end
-  end  
-end  
+  end
+end
