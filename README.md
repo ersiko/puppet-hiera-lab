@@ -1,17 +1,42 @@
 # "How does puppet work with hiera?" lab
-Lab for the puppet-hiera presentation
-This lab blablabla
+This lab is aimed for those people who don't know hiera. This is a practical example with real life (tm) examples. It will get you running on the basics of hiera/puppet, and you can get going from there.
 
-## What is an ENC (external node classifier)?
+## What is hiera? What can I use hiera for? what is an ENC (external node classifier)?
+[Hiera](https://github.com/puppetlabs/hiera) is basically a hierarchical key/value store, but used in conjunction with Puppet, it can serve the purpose of ENC or "External node classifier".
+According to [puppet documentation](https://docs.puppetlabs.com/guides/external_nodes.html): "An external node classifier is an arbitrary script or application which can tell Puppet which classes a node should have.It can replace or work in concert with the node definitions in the main site manifest (site.pp).". So basically you can use hiera to store which classes should be applied to which servers.
 
 ## Requirements for this lab
-Install python and boto
+This lab will be using python to create some servers in Amazon AWS. Those servers will be micro size, so they'll be on the free-tier (they won't cost you money if your aws account is younger than a year).
+
+You need to have installed in your computer:
+- python >= 2.7 
+- boto python library = 2.x
+
+Then you'll need the "[create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py)" script
+
+Also, regarding AWS, you'll need:
+- an AWS account, and an "access_key" / "secret_access_key" pair, with ec2 and vpc privileges.
+- a ssh public / private key pair. You'll need to set the key name and key path inside the python script for it to work.
+
 
 ## Preparation
-Create servers or run the script
+After meeting the requirements and editing the python script adding your keys, you'll need to set two env variables for boto to work:
+
+    export AWS_ACCESS_KEY_ID=AKIAIHERATGRKJJ36VM2A
+    export AWS_SECRET_ACCESS_KEY=+TQYfjhtFJFSJ4jjaIRltDoQMyqtg5HKRxU4vGLBUpof
+
+Then you can run the "[create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py)" script, and it'll create the needed aws instances.
+
+After all the instances are running, the script will output the lines you'll need to connect to all the servers. Just copy and paste that lines.
+
+When you're done with your lab, don't forget to remove all the servers. There's another script for that: [delete_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/delete_hiera_env.py)
 
 ## Confirming the env is working
-puppet cert --list --all
+Once the script finished, it will still take 4-5 minutes for all the servers to be properly configured. To confirm they are, connect to the puppetmaster and run:
+    
+    sudo puppet cert --list --all
+
+That will show you the list of running instances. It should have 8 entries. If it does, then you're goot to go, and can start with the lab!
 
 ## First step: Configuring hiera and installing packages common to all servers
 In this step we'll set hiera to apply the modules that will be common to all the servers in our infrastructure. In our case, that will be the "ntp" package.
