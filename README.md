@@ -122,8 +122,37 @@ In this file we'll set the variables to this particular server. Just two lines t
 Now you can check how webserver1.us-east-1.prod.client1.com has apache stopped while webserver2.us-east-1.prod.client1.com is up and running (and all the other servers, too). We also could uninstall apache and install and configure nginx if we wanted to test how apache performs against nginx on the same load.
 
 ## Sixth step: Mixing environment and role for variables
+Ok, now we have our apache servers running, and we want them to connect to mysql. Our app has a config file where we put the connection string. But the dev webservers must connect to the dev mysql servers, and the prod webservers to the prod mysql. And we can't use only the "env" facter, because each environment has other roles than webservers. How can we fix that? Easy, just mixing "env" and "roles" facters.
+
+To continue, in the puppet master, logged as root, type "6" just a plain number six) and it will checkout the proper git branch with the puppet configuration.
+
+No new puppet modules will be used for this step.
+
+Again, no new facters. The changes are in:
+- `/etc/puppet/hiera.yaml`: 
+There's a new line for the env/role origin (remember to restart puppetmaster after changing hiera.xml file).
+- `/etc/puppet/modules/webpage/manifests/init.pp`:
+We're adding a new parameter for our class "webpage" for the connection string.
+- `/etc/puppet/data/modules/webpage/templates/index.html.erb`:
+We're adding the connection string to the webpage so we can confirm it's working.
+- `/etc/puppet/data/env/prod/role/webserver.yaml`:
+Just adding the webpage::connection_string variable, setting it to connect to a prod server.
+- `/etc/puppet/data/env/dev/role/webserver.yaml`:
+Just adding the webpage::connection_string variable, setting it to connect to a dev server.
+
+Now you can check all prod an dev servers how they get their own mysql server to connect to.
 
 ## Seventh step: Mixing environment and datacenter and roles for variables
+Our mysql server was a bit overloaded and it wasn't performing well on the cross-datacenter read queries, so we decided to spin up a read-replica in the same datacenter as the webservers. All write queries will still go to the mysql master, but the reads will be dramatically improved. How can we do that? Exactly the same way we've been doing it so far.
+
+To continue, in the puppet master, logged as root, type "6" just a plain number six) and it will checkout the proper git branch with the puppet configuration.
+
+No new puppet modules will be used for this step.
+
+Again, no new facters. The changes are in:
+- `/etc/puppet/hiera.yaml`: 
+There's a new line for the datacenter/env/role origin (remember to restart puppetmaster after changing hiera.xml file). This is only an example, for real life (tm) you will probably set it in a different order, or a different directory, in a way that fits better your needs.
+
 
 ## Eighth step: How to control more than one client with the same puppet master
 
