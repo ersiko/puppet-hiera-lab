@@ -172,3 +172,11 @@ Here we're adding the "client" facter. Then we add some conditional statements s
 Adding the new "client" facter to the "/etc/facts" file so we can confirm it's working.
 - `/etc/puppet/hiera.yaml`: 
 There's a new line for the client/role origin (remember to restart puppetmaster after changing hiera.xml file). 
+- `/etc/puppet/data/role/webserver.yaml`:
+We're installing here php and adding the php::extension::mysql class that will be used in all webservers, no matter what client they are.
+- `/etc/puppet/data/client/client1/role/webserver.yaml`:
+This client uses memcached, so we're adding the memcached php module to their webservers.
+- `/etc/puppet/data/client/client2/role/webserver.yaml`:
+This client uses redis instead of memcached, so we're adding the redis php module to their webservers.
+
+Et voilà! We're managing two clients re-using our modules and our main configuration but also being able to adapt to their particularities. All set!
