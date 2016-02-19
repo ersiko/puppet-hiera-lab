@@ -3,4 +3,4 @@ classes:
   - webpage
   - php::apache
   - php::cli
-  - php::extension::mysql  
+  - php::extension::mysql
