@@ -2,10 +2,10 @@
 
 from boto import vpc
 import time
+import os
 
-KEY_NAME       = 'your-ec2-key' # put here the name of your key in amazon
-KEY_FILE       = '/path/to/your/ec2-key.pem' # put here the path to your key in the local computer
-
+KEY_NAME = os.getenv('$KEY_NAME')
+KEY_FILE = os.getenv('$KEY_FILE')
 
 amazon='ami-d22932be'
 ubuntu='ami-87564feb'
