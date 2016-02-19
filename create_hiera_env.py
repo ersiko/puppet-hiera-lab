@@ -4,8 +4,8 @@ from boto import vpc
 import time
 import os
 
-KEY_NAME = os.getenv('$KEY_NAME')
-KEY_FILE = os.getenv('$KEY_FILE')
+KEY_NAME = os.getenv('KEY_NAME')
+KEY_FILE = os.getenv('KEY_FILE')
 
 amazon='ami-d22932be'
 ubuntu='ami-87564feb'
@@ -275,7 +275,13 @@ elasticip = vpc_con.allocate_address(domain='vpc')
 print("Associating elasticip to puppetmaster instance")
 vpc_con.associate_address(instance_id=puppetmaster.id, allocation_id=elasticip.allocation_id)
 
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + " -L 2228:" + client2.private_ip_address + ":22 -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 -L 2227:" + mysql1.private_ip_address + ":22;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
+print("**********************************************************************")
+print("**                     Env created successfully                     **")
+print("**********************************************************************")
+print("")
+print("Now you should be able to connect to the servers copy/pasting the following lines:")
+print("")
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + " -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 -L 2227:" + mysql1.private_ip_address + ":22 -L 2228:" + client2.private_ip_address + ":22 -L 8088:" + client2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
