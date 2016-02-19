@@ -3,7 +3,7 @@
 from boto import vpc
 import time
 
-REGION          = 'ap-southeast-1'
+REGION          = 'eu-central-1'
 PROJECT         = 'Hiera-demo'
 
 vpc_con = vpc.connect_to_region(REGION)

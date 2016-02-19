@@ -1,21 +1,18 @@
 #!/usr/bin/env python
 
-try: 
-    from boto import vpc
-except: 
-    print("Can't import boto library. Is it installed and available?")
-    raise
+from boto import vpc
 import time
 
-amazon='ami-52978200'
-ubuntu='ami-96f1c1c4'
-redhat='ami-dc1c2b8e'
-nat   ='ami-1a9dac48'
+amazon='ami-d22932be'
+ubuntu='ami-87564feb'
+redhat='ami-875042eb'
+nat   ='ami-17273c7b'
 
 INSTANCE_TYPE  = 't2.micro'
 IMAGE          = ubuntu # Basic 64-bit Ubuntu AMI
-REGION         = 'ap-southeast-1' # Singapore, because I'm in Cambodia. Change this to your closest AWS Region
+REGION         = 'eu-central-1' # If you change this, you'll need to change AMIs codes as well, as they're different for each region
 KEY_NAME       = 'my-ec2-key'
+KEY_FILE       = '/home/tomas/Baixades/my-ec2-key.pem'
 PROJECT        = 'Hiera-demo'
 SECURITY_GROUP = ['Hiera-demo']
 PUPPET_NAME    = 'puppetmaster'
@@ -65,13 +62,6 @@ cp -a puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
 chmod u+x /usr/local/sbin/set-hostname.sh  
 chmod u+x /usr/local/sbin/configure-pat.sh  
 
-# Installing puppetlabs modules for the lab
-puppet module install puppetlabs-apache 
-puppet module install puppetlabs-ntp
-puppet module install puppetlabs-mysql
-puppet module install ghoneycutt-ssh
-puppet module install nodes-php
-
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
 echo PUT_HERE_THE_PUPPET_MASTER_IP PUT_HERE_THE_PUPPET_MASTER_NAME >> /etc/hosts
@@ -85,6 +75,16 @@ echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp
 
 # Make puppet data owned by puppet
 chown -R puppet /etc/puppet/data 
+
+# Set aliases for the different steps in the lab
+echo "alias 1='cd /etc/puppet;git checkout 1-Common;puppet module install puppetlabs-ntp'" >> /root/.bashrc
+echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
+echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;puppet module install puppetlabs-apache'" >> /root/.bashrc
+echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;puppet module install puppetlabs-mysql'" >> /root/.bashrc
+echo "alias 5='cd /etc/puppet;git checkout 5-HostVars'" >> /root/.bashrc
+echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars'" >> /root/.bashrc
+echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles'" >> /root/.bashrc
+echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;puppet module install nodes-php'" >> /root/.bashrc
 
 # And wrapping all up with a reboot
 reboot
@@ -272,13 +272,13 @@ elasticip = vpc_con.allocate_address(domain='vpc')
 print("Associating elasticip to puppetmaster instance")
 vpc_con.associate_address(instance_id=puppetmaster.id, allocation_id=elasticip.allocation_id)
 
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i my-ec2-key.pem -L 2228:" + client2.private_ip_address + ":22 -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + " -L 2228:" + client2.private_ip_address + ":22 -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 # -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 -L 2227:" + mysql1.private_ip_address + ":22;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i my-ec2-key.pem")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i my-ec2-key.pem")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i my-ec2-key.pem")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i my-ec2-key.pem")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i my-ec2-key.pem")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i my-ec2-key.pem")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
 
 
