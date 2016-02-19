@@ -141,7 +141,7 @@ def launch_instance(VPC_CON,INS_NAME,INS_USER_DATA,INS_IMAGE=IMAGE,INS_TYPE=INST
     USER_DATA_SERVERNAME = USER_DATA_SERVERNAME.replace("PUT_HERE_THE_PUPPET_MASTER_IP", PUPPET_MASTER_IP) # Ditto
     USER_DATA_SERVERNAME = USER_DATA_SERVERNAME.replace("PUT_HERE_THE_PUPPET_MASTER_NAME", PUPPET_NAME + '.' + REGION + '.compute.internal') # Ditto
     USER_DATA_SERVERNAME = USER_DATA_SERVERNAME.replace("PUT_HERE_THE_BE_SUBNET", subnetbe.cidr_block)
-    print("Creating " + SERVER_NAME + " with user_data " + USER_DATA_SERVERNAME)
+    #print("Creating " + SERVER_NAME + " with user_data " + USER_DATA_SERVERNAME)
     reservation = VPC_CON.run_instances(image_id          =INS_IMAGE, 
                                         instance_type     =INS_TYPE, 
                                         key_name          =INS_KEY_NAME, 
