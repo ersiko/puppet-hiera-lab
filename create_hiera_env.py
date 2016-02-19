@@ -78,15 +78,15 @@ echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp
 chown -R puppet /etc/puppet/data 
 
 # Set aliases for the different steps in the lab
-echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch'" >> /root/.bashrc
-echo "alias 1='cd /etc/puppet;git checkout 1-Common;puppet module install puppetlabs-ntp'" >> /root/.bashrc
-echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
-echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;puppet module install puppetlabs-apache'" >> /root/.bashrc
-echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;puppet module install puppetlabs-mysql'" >> /root/.bashrc
-echo "alias 5='cd /etc/puppet;git checkout 5-HostVars'" >> /root/.bashrc
-echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars'" >> /root/.bashrc
-echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles'" >> /root/.bashrc
-echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;puppet module install nodes-php'" >> /root/.bashrc
+echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 1='cd /etc/puppet;git checkout 1-Common;service puppetmaster restart;puppet module install puppetlabs-ntp'" >> /root/.bashrc
+echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
+echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql'" >> /root/.bashrc
+echo "alias 5='cd /etc/puppet;git checkout 5-HostVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;service puppetmaster restart;puppet module install nodes-php'" >> /root/.bashrc
 
 # And wrapping all up with a reboot
 reboot
