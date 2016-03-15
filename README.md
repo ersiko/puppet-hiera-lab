@@ -5,6 +5,25 @@ This lab is aimed for those people who don't know hiera. This is a practical exa
 [Hiera](https://github.com/puppetlabs/hiera) is basically a hierarchical key/value store, but used in conjunction with Puppet, it can serve the purpose of ENC or "External node classifier".
 According to [puppet documentation](https://docs.puppetlabs.com/guides/external_nodes.html): "An external node classifier is an arbitrary script or application which can tell Puppet which classes a node should have.It can replace or work in concert with the node definitions in the main site manifest (site.pp).". So basically you can use hiera to store which classes should be applied to which servers.
 
+## What's the objective of this lab?
+We'll set up an environment where we will be able to experiment with different ways of structuring the configuration of our servers. We'll extract information about them (mostly from their servername) as a fact, and then we'll use that information to configure them depending on their datacenter, the environment they're in, the role of the server, and so on. 
+
+## Lab layout
+In this lab we'll try to work with a real web environment we can see every day. That means:
+
+- We'll have different server roles: webservers and mysql servers. 
+- We'll fake two different datacenters: us-east-1 and us-west-1 (just faking it, because all servers are actually in the same aws region, in Europe). 
+- We'll consider 3 different environments: dev, stage and prod.
+- We'll consider 2 different domain names, so we can consider we're covering 2 different clients (or 2 different websites from the same client). The names are: client1 and client2.
+
+The servername syntax for client1 will be <role><number>.<datacenter>.<environment>.<domain>. Example: webserver2.us-east-1.prod.client1.com
+The servername syntax for client2 will be intentionally different to show some more possibilities, being <env><role><number>.<domain>. Exampe: pweb1.client2.com
+
+All of them will be connected to the same puppet master. We won't discuss here if this layout is secure or if it can be improved, as it's just a test environment to learn about puppet and hiera.
+
+This environment will be created by a python script: create_hiera_env.py. It will create 7 aws instances, type 't2.micro' so we can use the aws free tier. 
+There is also a "delete_hiera_env.py" script so we can just delete all servers in our lab and not incur into expenses. Don't forget to run it when you're done with the lab!
+
 ## Requirements for this lab
 This lab will be using python to create some servers in Amazon AWS. Those servers will be micro size, so they'll be on the free-tier (they won't cost you money if your aws account is younger than a year).
 
