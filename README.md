@@ -36,6 +36,7 @@ Then you'll need the "[create_hiera_env.py](https://github.com/ersiko/puppet-hie
 Also, regarding AWS, you'll need:
 - an AWS account, and an "access_key" / "secret_access_key" pair with ec2 and vpc privileges, set inside the exportenv.sh file.
 - a ssh public / private key pair. You'll need to set the key name and key path inside the exportenv.sh file.
+- it's best to set this file with 600 permissions (chmod 600 exportenv.sh), and we've added this to the .gitignore also.
 
 
 # Preparation
@@ -43,7 +44,7 @@ After meeting the requirements and editing the exportenv.sh script, simply run t
 
     source exportenv.sh
 
-Then you can run the "[create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py)" script, and it'll create the needed aws instances.
+Then you can run the [create_hiera_env.py](https://github.com/ersiko/puppet-hiera-lab/blob/master/create_hiera_env.py) script, and it'll create the needed aws instances.
 
 After all the instances are running, the script will output the lines you'll need to connect to all the servers. Just copy and paste the lines.
 
