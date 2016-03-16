@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+echo ""
+echo "---------------------------------------------------------------------------------------------"
+echo ""
+echo "Hello and welcome to the puppet hiera lab!"
+echo "" 
+echo "You're about to experiment with configuration data structured in different ways, and puppet modules applied on different criteria"
+echo "To start the lab, get root access with 'sudo -i' and then just type '0' (the number zero)"
+echo ""
+echo "Enjoy!"
+echo ""

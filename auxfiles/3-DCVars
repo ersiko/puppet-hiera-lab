@@ -1,0 +1,20 @@
+THIRD STEP: CONFIGURING VARIABLES DEPENDING ON THE DATACENTER
+
+We usually want to have the most exact time possible in our servers. For that, a low latency to our ntp servers is important. In our example, some of our servers are in one datacenter and some of them are in a different one, so it would be ideal if each server sync'ed the time with the closest ntp server. For that, we'll be setting those variables depending on what datacenter we are.
+
+We'll update our "facts" module to get the datacenter we're in. The changes are:
+
+/etc/puppet/modules/facts/lib/facter/facts.rb: We'll be adding a new snippet for the datacenter info
+/etc/puppet/modules/facts/templates/factlist.erb: We'll be adding the new facter to the file, to confirm it's working as expected.
+
+
+After that, you can check the /etc/facts file in any server to see the new facter addition. Now we'll use that facter for our purpose. The changes:
+
+/etc/puppet/hiera.yaml: There's a new line for the datacenter origin (remember to restart puppetmaster after changing hiera.xml file)
+/etc/puppet/data/datacenter/us-east-1.yaml: Here we'll set the ntp config variables for the us-east-1 ntp servers
+/etc/puppet/data/datacenter/us-wast-1.yaml: Here we'll set the ntp config variables for the us-west-1 ntp servers
+
+
+After a while, you'll see how the /etc/ntp.conf file has changed in all servers, and the us-east-1 servers will show different ntp config than us-west-1
+
+To continue type "4" (just a plain number four) and it will checkout the proper git branch with the puppet configuration.

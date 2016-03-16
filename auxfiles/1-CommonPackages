@@ -1,0 +1,13 @@
+FIRST STEP: CONFIGURING HIERA AND INSTALLING COMMON PACKAGES TO ALL SERVERS
+
+In this step we'll set hiera to apply the modules that will be common to all the servers in our infrastructure. In our case, that will be the "ntp" package.
+
+Relevant files:
+
+/etc/puppet/hiera.yaml: In this file we're describing where hiera should look for config files with classes and variables to apply to the servers in our infrastructure, and the precedence of them. More details in the hiera.xml section in puppet docs.
+
+/etc/puppet/data/common.yaml: We set this path is the previous hiera.yaml file. Classes and variables on this file will be applied to all servers.
+
+After 30 seconds max you should see in all the servers /var/log/syslog how "ntp" package is installed. Also apt-cache policy ntp will show it.
+
+Once you've checked the changes, to continue the lab type "2" (just a plain number two) and it will checkout the proper git branch with the puppet configuration.

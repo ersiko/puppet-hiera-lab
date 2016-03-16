@@ -1,0 +1,33 @@
+SECOND STEP: CONFIGURING VARIABLES DEPENDING ON THE ENVIRONMENT
+
+Access to prod servers is usually restricted to just a few people, while access to dev environments is more broad. We can manage access with hiera, depending on the env of the server.
+
+First of all, we'll install an ssh puppet module by running "puppet module install ghoneycutt-ssh" as root (the "2" command will run this command for you).
+
+
+Then we'll get a new module, facts, which will take create some custom facts we will be using for our configuration. The files are:
+
+/etc/puppet/modules/facts/lib/facter/facts.rb: This file will hold ruby code for creating new facters. We'll be using the host fqdn to extract the fields we're interested in. It will extract the environment information from the fqdn and assign it to a "facter". In this example, that will be "env".
+
+/etc/puppet/modules/facts/manifests/init.pp: In order to check easily if our facter is working properly, we'll publish a file with all our custom facts. We'll be using a template (the next file)
+
+/etc/puppet/modules/facts/templates/factlist.erb: This file will be the template for /etc/facts, where we'll publish our facters. So far it's only "env".
+
+
+Then we'll add both classes, "facts" and "ssh" to the common.yaml, as all of our servers will be using them:
+
+/etc/puppet/data/common.yaml: Two new lines, adding class "facts" and "ssh"
+
+
+Then after a while we can see a new /etc/facts file will appear in our servers, showing which env are we in. Once we have this custom fact running, we'll use it for hiera. We'll need to change the hiera.yaml file to add a new origin for config files. The precedence policy is "first one wins" (as if the origins in hiera.yaml were applied bottom to top), so we'll put the new origin on top of the common.yaml one. And remember: every time you change hiera.yaml, you'll need to restart puppetmaster for it to get the changes. Changes:
+
+/etc/puppet/hiera.yaml: There's a new line for the env origin
+
+/etc/puppet/data/env/dev.yaml: In this file we'll be allowing access to the devs and the devops ssh public keys.
+
+/etc/puppet/data/env/prod.yaml: In this file we'll be allowing access to the devops ssh public key, and at the same time disallowing dev access to prod.
+
+
+After a while you'll see how the contents of the /root/.ssh/authorized_keys file will match the keys. And if you manually add the devs key to the prod server, it will be erased by puppet.
+
+Once you've checked the changes, to continue the lab type "3" (just a plain number three) and it will checkout the proper git branch with the puppet configuration.

@@ -1,0 +1,5 @@
+STARTING FROM SCRATCH
+
+We just configured a puppet master with some slaves. If you know what you're doing and want to experiment or test your modules, feel free to do so!
+
+But if you want to start the lab, type "1" (just a plain number one) and it will checkout the proper git branch with the puppet configuration.

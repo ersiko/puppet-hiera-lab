@@ -17,7 +17,7 @@ In this lab we'll try to work with a real web environment we can see every day. 
 - We'll consider 2 different domain names, so we can consider we're covering 2 different clients (or 2 different websites from the same client). The names are: client1 and client2.
 
 The servername syntax for client1 will be RoleNumber.datacenter.environment.domain. Example: webserver2.us-east-1.prod.client1.com
-The servername syntax for client2 will be intentionally different to show some more possibilities, being EnvRoleNumber.domain. Exampe: pweb1.client2.com
+The servername syntax for client2 will be intentionally different to show some more possibilities, being EnvRoleNumber.domain. Example: pweb1.client2.com
 
 All of them will be connected to the same puppet master. We won't discuss here if this layout is secure or if it can be improved, as it's just a test environment to learn about puppet and hiera.
 

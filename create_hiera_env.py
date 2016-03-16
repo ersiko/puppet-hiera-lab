@@ -18,13 +18,13 @@ REGION         = 'eu-central-1' # If you change this, you'll need to change AMIs
 PROJECT        = 'Hiera-demo'
 SECURITY_GROUP = ['Hiera-demo']
 PUPPET_NAME    = 'puppetmaster'
-WEBSERVER1_PROD_NAME = 'webserver1.us-east-1.prod.client1.com'
-WEBSERVER2_PROD_NAME = 'webserver2.us-east-1.prod.client1.com'
+WEBSERVER1_PROD_NAME     = 'webserver1.us-east-1.prod.client1.com'
+WEBSERVER2_PROD_NAME     = 'webserver2.us-east-1.prod.client1.com'
 WEBSERVER1_PROD_DC2_NAME = 'webserver1.us-west-1.prod.client1.com'
-WEBSERVER1_STAGE_NAME = 'webserver1.us-west-1.stage.client1.com'
-WEBSERVER1_DEV_NAME = 'webserver1.us-east-1.dev.client1.com'
-MYSQL1_PROD_NAME = 'mysql1.us-east-1.prod.client1.com'
-CLIENT2_NAME = 'pweb1.client2.com'
+WEBSERVER1_STAGE_NAME    = 'webserver1.us-west-1.stage.client1.com'
+WEBSERVER1_DEV_NAME      = 'webserver1.us-east-1.dev.client1.com'
+MYSQL1_PROD_NAME         = 'mysql1.us-east-1.prod.client1.com'
+CLIENT2_NAME             = 'pweb1.client2.com'
 
 PUPPET_NAME            = "puppetmaster"
 PUPPET_USER_DATA       = """#!/bin/bash
@@ -61,9 +61,11 @@ sed -i -e 's/\[master\]/\[master\]\\nautosign = true/g' /etc/puppet/puppet.conf
 sed -i -e 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf 
 
 # Copying configure-pat.sh and set-hostname.sh and setting them u+x
-cp -a puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
+cp -a /puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
 chmod u+x /usr/local/sbin/set-hostname.sh  
 chmod u+x /usr/local/sbin/configure-pat.sh  
+mv /usr/local/sbin/52-labintro /etc/update-motd.d/
+chmod u+x /etc/update-motd.d/52-labintro
 
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
@@ -80,15 +82,15 @@ echo "hiera_include('classes')" >> /etc/puppet/manifests/site.pp
 chown -R puppet /etc/puppet/data 
 
 # Set aliases for the different steps in the lab
-echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 1='cd /etc/puppet;git checkout 1-Common;service puppetmaster restart;puppet module install puppetlabs-ntp'" >> /root/.bashrc
-echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
-echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql'" >> /root/.bashrc
-echo "alias 5='cd /etc/puppet;git checkout 5-HostVars;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;service puppetmaster restart;puppet module install nodes-php'" >> /root/.bashrc
+echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch;cat /usr/local/sbin/0-StartFromScratch;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 1='cd /etc/puppet;git checkout 1-Common;cat /usr/local/sbin/1-CommonPackages;service puppetmaster restart;puppet module install puppetlabs-ntp'" >> /root/.bashrc
+echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;cat /usr/local/sbin/2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
+echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;cat /usr/local/sbin/3-DCVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;cat /usr/local/sbin/4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql'" >> /root/.bashrc
+echo "alias 5='cd /etc/puppet;git checkout 5-HostVars;cat /usr/local/sbin/5-HostVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars;cat /usr/local/sbin/6-EnvAndRoleVars;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles;cat /usr/local/sbin/7-MixDCandEnvsAndRoles;service puppetmaster restart'" >> /root/.bashrc
+echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;cat /usr/local/sbin/8-ClientVars;service puppetmaster restart;puppet module install nodes-php'" >> /root/.bashrc
 
 # And wrapping all up with a reboot
 reboot
@@ -281,12 +283,21 @@ print("**********************************************************************")
 print("")
 print("Now you should be able to connect to the servers copy/pasting the following lines:")
 print("")
-print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + " -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 -L 2227:" + mysql1.private_ip_address + ":22 -L 2228:" + client2.private_ip_address + ":22 -L 8088:" + client2.private_ip_address + ":80;ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("Puppetmaster: ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + 
+                                            " -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 " +
+                                            " -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 " +
+                                            " -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 " +
+                                            " -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 " +
+                                            " -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 " +
+                                            " -L 2227:" + mysql1.private_ip_address + ":22 "
+                                            " -L 2228:" + client2.private_ip_address + ":22 -L 8088:" + client2.private_ip_address + ":80 " +
+                                            ";ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
+print("Dev: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
+print("Stage: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
+print("Prod1: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
+print("Prod2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
+print("Prod1 at dc2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
+print("Mysql1: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("Client2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
 
 
