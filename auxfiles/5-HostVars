@@ -1,0 +1,14 @@
+FIFTH STEP: SETTING VARIABLES JUST FOR A PARTICULAR HOST
+
+Our cluster of webservers was working ok, but one server started acting up! We want to take it out of the cluster ASAP, and continue with the other hosts, but we'd also like to investigate what's going on with this particular one. No problem! Hiera will help us with that.
+
+No new puppet modules will be used for this step.
+
+This time we already have a useful facter for our purpose: fqdn. So the changes we'll made are:
+
+/etc/puppet/hiera.yaml: There's a new line for the host origin (remember to restart puppetmaster after changing hiera.xml file). This "hosts" origin will usually be the first line in the hierarchy, as you don't want them to be overriden.
+/etc/puppet/data/hosts/webserver1.us-east-1.prod.client1.com.yaml: In this file we'll set the variables to this particular server. Just two lines to make sure apache is stopped and it won't start if the server reboots.
+
+
+Now you can check how webserver1.us-east-1.prod.client1.com has apache stopped while webserver2.us-east-1.prod.client1.com is up and running (and all the other servers, too). We also could uninstall apache and install and configure nginx if we wanted to test how apache performs against nginx on the same load.
+

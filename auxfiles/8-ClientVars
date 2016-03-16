@@ -1,0 +1,17 @@
+EIGHTH STEP: HOW TO CONTROL MORE THAN ONE CLIENT WITH THE SAME PUPPET MASTER
+
+Perfect! We have our modules and our configurations... great! Now I'd like to use all my effort in all the websites I'm managing. But they're all different clients, different domains and different name format... Could we add those servers to our puppet master? Yeah, of course!
+
+For this step we'll be using the puppet module "nodes-php". The last command (8) have already installed them for you.
+
+We'll add one new facter called "client", but not only that. As the name format is different (webserver1.prod.us-east1.client1.com vs pweb1.client2.com), we'll need to add some extra code to our existing facters to adapt to both formats, changing the following files:
+
+/etc/puppet/modules/facts/lib/facter/facts.rb: Here we're adding the "client" facter. Then we add some conditional statements so we extract the values from the fqdn in different ways for both clients.
+/etc/puppet/modules/facts/templates/factlist.erb: Adding the new "client" facter to the "/etc/facts" file so we can confirm it's working.
+/etc/puppet/hiera.yaml: There's a new line for the client/role origin (remember to restart puppetmaster after changing hiera.xml file).
+/etc/puppet/data/role/webserver.yaml: We're installing here php and adding the php::extension::mysql class that will be used in all webservers, no matter what client they are.
+/etc/puppet/data/client/client1/role/webserver.yaml: This client uses memcached, so we're adding the memcached php module to their webservers.
+/etc/puppet/data/client/client2/role/webserver.yaml: This client uses redis instead of memcached, so we're adding the redis php module to their webservers.
+
+
+Et voilà! We're managing two clients re-using our modules and our main configuration but also being able to adapt to their particularities. All set!

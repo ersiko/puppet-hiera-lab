@@ -1,0 +1,25 @@
+FOURTH STEP: CONFIGURING VARIABLES DEPENDING ON THE SERVER ROLE
+
+Now our servers are getting in shape. Next we want to do is to install packages depending on the role they have. Webservers will need apache while database servers will need mysql. As we did before, we can use hiera for that.
+
+For this step we'll be using the puppet modules "puppetlabs-apache" and "puppetlabs-mysql" using "puppet module install". The last command (4) have already installed them for you.
+
+Again, we'll update our "facts" module, this time to get the server role. The changes are:
+
+/etc/puppet/modules/facts/lib/facter/facts.rb: We'll be adding a new snippet for the role info
+/etc/puppet/modules/facts/templates/factlist.erb: We'll be adding the new facter to the file, to confirm it's working as expected.
+
+After that, you can check the /etc/facts file in any server to see the new facter addition. Now we'll use that facter for our purpose. The changes:
+
+/etc/puppet/hiera.yaml: There's a new line for the role origin (remember to restart puppetmaster after changing hiera.xml file)
+/etc/puppet/data/role/mysql.yaml: Here we'll set the mysql configurations. For now, we'll just apply the "mysql::server" class so the service gets installed and running
+/etc/puppet/data/role/apache.yaml: Here we'll set the apache configurations. For now, we'll just apply the "apache" class so the service gets installed and running.
+
+
+To access our data over http and confirm it's working, we'll create a webpage showing some info. That will be a simple module called "webpage", with this contents:
+
+/etc/puppet/modules/webpage/manifests/init.pp: We'll add here the definition of the /var/www/html/index.html file with our custom facts.
+/etc/puppet/modules/webpage/templates/index.html.erb: Text file containing our variables.
+
+At this point we can access our apache servers over http and check the information in them.
+

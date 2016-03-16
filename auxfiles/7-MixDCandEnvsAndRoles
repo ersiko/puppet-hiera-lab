@@ -1,0 +1,13 @@
+SEVENTH STEP: MIXING ENVIRONMENT AND DATACENTER AND ROLES FOR VARIABLES
+
+Our mysql server was a bit overloaded and it wasn't performing well on the cross-datacenter read queries, so we decided to spin up a read-replica in the same datacenter as the webservers. All write queries will still go to the mysql master, but the reads will be dramatically improved. How can we do that? Exactly the same way we've been doing it so far.
+
+No new puppet modules will be used for this step.
+
+Again, no new facters. The changes are in:
+
+/etc/puppet/hiera.yaml: There's a new line for the datacenter/env/role origin (remember to restart puppetmaster after changing hiera.xml file). This is only an example, for real life (tm) you will probably set it in a different order, or a different directory, in a way that fits better your needs.
+/etc/puppet/data/datacenter/us-west-1/env/prod/role/webserver.yaml: Here we're setting the new connection string for the us-west-1 datacenter prod webservers
+
+
+And we can check now in the webpage how are they both connecting to different servers.
