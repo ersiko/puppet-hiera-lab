@@ -4,9 +4,25 @@ from boto import vpc
 import time
 import os
 
+# Making sure the env vars exist, so the script can run nicely. A bit dirty, but it's the only way I know!
 KEY_NAME = os.getenv('KEY_NAME')
+if KEY_NAME is None or KEY_NAME == '[ec2_keypair_name]':
+    print("Error, KEY_NAME env var not found. Either KEY_NAME is not set in exportenv.sh, or exportenv.sh wasn't sourced. Edit exportenv.sh, make sure all vars are set, then run 'source exportenv.sh' or '. exportenv.sh'")
+    exit()
 KEY_FILE = os.getenv('KEY_FILE')
+if KEY_FILE is None or KEY_FILE == '[ec2_private_key_file]':
+    print("Error, KEY_FILE env var not found. Either KEY_FILE is not set in exportenv.sh, or exportenv.sh wasn't sourced. Edit exportenv.sh, make sure all vars are set, then run 'source exportenv.sh' or '. exportenv.sh'")
+    exit()
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+if AWS_ACCESS_KEY_ID is None or AWS_ACCESS_KEY_ID == '[string]' :
+    print("Error, AWS_ACCESS_KEY_ID env var not found. Either AWS_ACCESS_KEY_ID is not set in exportenv.sh, or exportenv.sh wasn't sourced. Edit exportenv.sh, make sure all vars are set, then run 'source exportenv.sh' or '. exportenv.sh'")
+    exit()
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+if AWS_SECRET_ACCESS_KEY is None or AWS_SECRET_ACCESS_KEY == '[string]':
+    print("Error, AWS_SECRET_ACCESS_KEY env var not found. Either AWS_SECRET_ACCESS_KEY is not set in exportenv.sh, or exportenv.sh wasn't sourced. Edit exportenv.sh, make sure all vars are set, then run 'source exportenv.sh' or '. exportenv.sh'")
+    exit()
 
+# These are the AMI codes for Frankfurt (eu-central-1)
 amazon='ami-d22932be'
 ubuntu='ami-87564feb'
 redhat='ami-875042eb'
@@ -53,7 +69,6 @@ git clone https://github.com/ersiko/puppet-hiera-lab.git
 cp -a /etc/puppet/* puppet-hiera-lab/puppet-config/.
 mv /etc/puppet /etc/puppet.orig
 ln -s /puppet-hiera-lab/puppet-config/ /etc/puppet
-cd /etc/puppet;git checkout 0-StartFromScratch
 
 # Enabling puppet master start and cert autosigning
 sed -i -e 's/START=no/START=yes/g' /etc/default/puppet
@@ -66,6 +81,7 @@ chmod u+x /usr/local/sbin/set-hostname.sh
 chmod u+x /usr/local/sbin/configure-pat.sh  
 mv /usr/local/sbin/52-labintro /etc/update-motd.d/
 chmod u+x /etc/update-motd.d/52-labintro
+cd /etc/puppet;git checkout 0-StartFromScratch
 
 # Setting the server name in hostname and /etc/hosts
 echo PUT_HERE_THE_SERVER_NAME > /etc/hostname
@@ -283,7 +299,8 @@ print("**********************************************************************")
 print("")
 print("Now you should be able to connect to the servers copy/pasting the following lines:")
 print("")
-print("Puppetmaster: ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + 
+print("Puppetmaster: ")
+print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + 
                                             " -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 " +
                                             " -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 " +
                                             " -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 " +
@@ -292,12 +309,19 @@ print("Puppetmaster: ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyCh
                                             " -L 2227:" + mysql1.private_ip_address + ":22 "
                                             " -L 2228:" + client2.private_ip_address + ":22 -L 8088:" + client2.private_ip_address + ":80 " +
                                             ";ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
-print("Dev: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
-print("Stage: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
-print("Prod1: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
-print("Prod2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
-print("Prod1 at dc2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
-print("Mysql1: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
-print("Client2: ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("Dev:")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
+print("Stage:")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
+print("Prod1:")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
+print("Prod2: ")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
+print("Prod1 at dc2:") 
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
+print("Mysql1:")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("Client2:")
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
 
 
