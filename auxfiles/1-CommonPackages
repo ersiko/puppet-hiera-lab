@@ -8,6 +8,6 @@ Relevant files:
 
 /etc/puppet/data/common.yaml: We set this path is the previous hiera.yaml file. Classes and variables on this file will be applied to all servers.
 
-After 30 seconds max you should see in all the servers /var/log/syslog how "ntp" package is installed. Also apt-cache policy ntp will show it.
+After 30 seconds max you should see in all the servers "/var/log/syslog" how "ntp" package is installed. Also "apt-cache policy ntp" will show it.
 
 Once you've checked the changes, to continue the lab type "2" (just a plain number two) and it will checkout the proper git branch with the puppet configuration.

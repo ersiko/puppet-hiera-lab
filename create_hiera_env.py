@@ -22,7 +22,7 @@ if AWS_SECRET_ACCESS_KEY is None or AWS_SECRET_ACCESS_KEY == '[string]':
     print("Error, AWS_SECRET_ACCESS_KEY env var not found. Either AWS_SECRET_ACCESS_KEY is not set in exportenv.sh, or exportenv.sh wasn't sourced. Edit exportenv.sh, make sure all vars are set, then run 'source exportenv.sh' or '. exportenv.sh'")
     exit()
 
-# These are the AMI codes for Frankfurt (eu-central-1)
+# These are the AMI codes for Frankfurt (eu-central-1
 amazon='ami-d22932be'
 ubuntu='ami-87564feb'
 redhat='ami-875042eb'
@@ -322,6 +322,6 @@ print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostK
 print("Mysql1:")
 print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
 print("Client2:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2228 -i " + KEY_FILE)
 
 

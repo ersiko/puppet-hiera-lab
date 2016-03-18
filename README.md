@@ -116,7 +116,7 @@ After that, you can check the `/etc/facts` file in any server to see the new fac
 There's a new line for the datacenter origin (remember to restart puppetmaster after changing hiera.xml file)
 - `/etc/puppet/data/datacenter/us-east-1.yaml`:
 Here we'll set the ntp config variables for the us-east-1 ntp servers
-- `/etc/puppet/data/datacenter/us-wast-1.yaml`:
+- `/etc/puppet/data/datacenter/us-west-1.yaml`:
 Here we'll set the ntp config variables for the us-west-1 ntp servers
 
 After a while, you'll see how the `/etc/ntp.conf` file has changed in all servers, and the us-east-1 servers will show different ntp config than us-west-1
@@ -139,7 +139,7 @@ After that, you can check the `/etc/facts` file in any server to see the new fac
 There's a new line for the role origin (remember to restart puppetmaster after changing hiera.xml file)
 - `/etc/puppet/data/role/mysql.yaml`: 
 Here we'll set the mysql configurations. For now, we'll just apply the "mysql::server" class so the service gets installed and running
-- `/etc/puppet/data/role/apache.yaml`: 
+- `/etc/puppet/data/role/webserver.yaml`: 
 Here we'll set the apache configurations. For now, we'll just apply the "apache" class so the service gets installed and running. 
 
 To access our data over http and confirm it's working, we'll create a webpage showing some info. That will be a simple module called "webpage", with this contents:
@@ -184,7 +184,7 @@ Just adding the webpage::connection_string variable, setting it to connect to a 
 - `/etc/puppet/data/env/dev/role/webserver.yaml`:
 Just adding the webpage::connection_string variable, setting it to connect to a dev server.
 
-Now you can check all prod an dev servers how they get their own mysql server to connect to.
+Now you can check all prod and dev servers how they get their own mysql server to connect to.
 
 ## Seventh step: Mixing environment and datacenter and roles for variables
 Our mysql server was a bit overloaded and it wasn't performing well on the cross-datacenter read queries, so we decided to spin up a read-replica in the same datacenter as the webservers. All write queries will still go to the mysql master, but the reads will be dramatically improved. How can we do that? Exactly the same way we've been doing it so far.

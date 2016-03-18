@@ -13,7 +13,7 @@ After that, you can check the /etc/facts file in any server to see the new facte
 
 /etc/puppet/hiera.yaml: There's a new line for the role origin (remember to restart puppetmaster after changing hiera.xml file)
 /etc/puppet/data/role/mysql.yaml: Here we'll set the mysql configurations. For now, we'll just apply the "mysql::server" class so the service gets installed and running
-/etc/puppet/data/role/apache.yaml: Here we'll set the apache configurations. For now, we'll just apply the "apache" class so the service gets installed and running.
+/etc/puppet/data/role/webserver.yaml: Here we'll set the apache configurations. For now, we'll just apply the "apache" class so the service gets installed and running.
 
 
 To access our data over http and confirm it's working, we'll create a webpage showing some info. That will be a simple module called "webpage", with this contents:
