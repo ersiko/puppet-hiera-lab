@@ -177,7 +177,7 @@ Again, no new facters. The changes are in:
 There's a new line for the env/role origin (remember to restart puppetmaster after changing hiera.xml file).
 - `/etc/puppet/modules/webpage/manifests/init.pp`:
 We're adding a new parameter for our class "webpage" for the connection string.
-- `/etc/puppet/data/modules/webpage/templates/index.html.erb`:
+- `/etc/puppet/modules/webpage/templates/index.html.erb`:
 We're adding the connection string to the webpage so we can confirm it's working.
 - `/etc/puppet/data/env/prod/role/webserver.yaml`:
 Just adding the webpage::connection_string variable, setting it to connect to a prod server.
