@@ -79,8 +79,14 @@ sed -i -e 's/^templatedir=/#templatedir/g' /etc/puppet/puppet.conf
 cp -a /puppet-hiera-lab/auxfiles/* /usr/local/sbin/.
 chmod u+x /usr/local/sbin/set-hostname.sh  
 chmod u+x /usr/local/sbin/configure-pat.sh  
+
+# Fixing the motd so we can introduce the welcome message
 mv /usr/local/sbin/52-labintro /etc/update-motd.d/
 chmod u+x /etc/update-motd.d/52-labintro
+cat /dev/null > /etc/legal
+rm /etc/update-motd.d/50-landscape-sysinfo /etc/update-motd.d/51-cloudguest /etc/update-motd.d/10-help-text
+
+# Applying the basic puppet config
 cd /etc/puppet;git checkout 0-StartFromScratch
 
 # Setting the server name in hostname and /etc/hosts
@@ -100,13 +106,13 @@ chown -R puppet /etc/puppet/data
 # Set aliases for the different steps in the lab
 echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch;cat /usr/local/sbin/0-StartFromScratch;service puppetmaster restart'" >> /root/.bashrc
 echo "alias 1='cd /etc/puppet;git checkout 1-Common;cat /usr/local/sbin/1-CommonPackages;service puppetmaster restart;puppet module install puppetlabs-ntp'" >> /root/.bashrc
-echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;cat /usr/local/sbin/2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh'" >> /root/.bashrc
+echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;cat /usr/local/sbin/2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh;puppet module install puppetlabs-ntp'" >> /root/.bashrc
 echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;cat /usr/local/sbin/3-DCVars;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;cat /usr/local/sbin/4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql'" >> /root/.bashrc
+echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;cat /usr/local/sbin/4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql;puppet module install ghoneycutt-ssh;puppet module install puppetlabs-ntp'" >> /root/.bashrc
 echo "alias 5='cd /etc/puppet;git checkout 5-HostVars;cat /usr/local/sbin/5-HostVars;service puppetmaster restart'" >> /root/.bashrc
 echo "alias 6='cd /etc/puppet;git checkout 6-EnvAndRoleVars;cat /usr/local/sbin/6-EnvAndRoleVars;service puppetmaster restart'" >> /root/.bashrc
 echo "alias 7='cd /etc/puppet;git checkout 7-MixDCandEnvsAndRoles;cat /usr/local/sbin/7-MixDCandEnvsAndRoles;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;cat /usr/local/sbin/8-ClientVars;service puppetmaster restart;puppet module install nodes-php'" >> /root/.bashrc
+echo "alias 8='cd /etc/puppet;git checkout 8-ClientVars;cat /usr/local/sbin/8-ClientVars;service puppetmaster restart;puppet module install nodes-php;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql;puppet module install ghoneycutt-ssh;puppet module install puppetlabs-ntp'" >> /root/.bashrc
 
 # And wrapping all up with a reboot
 reboot
