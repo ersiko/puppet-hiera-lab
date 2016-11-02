@@ -105,7 +105,7 @@ chown -R puppet /etc/puppet/data
 
 # Set aliases for the different steps in the lab
 echo "alias 0='cd /etc/puppet;git checkout 0-StartFromScratch;cat /usr/local/sbin/0-StartFromScratch;service puppetmaster restart'" >> /root/.bashrc
-echo "alias 1='cd /etc/puppet;git checkout 1-Common;cat /usr/local/sbin/1-CommonPackages;service puppetmaster restart;puppet module install puppetlabs-ntp'" >> /root/.bashrc
+echo "alias 1='cd /etc/puppet;git checkout 1-Common;cat /usr/local/sbin/1-CommonPackages;service puppetmaster restart;puppet module install puppetlabs-stdlib;git clone https://github.com/puppetlabs/puppetlabs-ntp.git;cd puppetlabs-ntp;git checkout 4.2.x;cd ..;mv puppetlabs-ntp /etc/puppet/modules/ntp'" >> /root/.bashrc
 echo "alias 2='cd /etc/puppet;git checkout 2-EnvVars;cat /usr/local/sbin/2-EnvVars;service puppetmaster restart;puppet module install ghoneycutt-ssh;puppet module install puppetlabs-ntp'" >> /root/.bashrc
 echo "alias 3='cd /etc/puppet;git checkout 3-DCVars;cat /usr/local/sbin/3-DCVars;service puppetmaster restart'" >> /root/.bashrc
 echo "alias 4='cd /etc/puppet;git checkout 4-RoleVars;cat /usr/local/sbin/4-RoleVars;service puppetmaster restart;puppet module install puppetlabs-apache;puppet module install puppetlabs-mysql;puppet module install ghoneycutt-ssh;puppet module install puppetlabs-ntp'" >> /root/.bashrc
