@@ -307,27 +307,27 @@ print("Now you should be able to connect to the servers copy/pasting the followi
 print("")
 print("Puppetmaster: ")
 print("ssh ubuntu@" + elasticip.public_ip + " -o \"StrictHostKeyChecking no\" -i " + KEY_FILE + 
-                                            " -L 2222:" + dev.private_ip_address + ":22 -L 8082:" + dev.private_ip_address + ":80 " +
-                                            " -L 2223:" + stage.private_ip_address + ":22 -L 8083:" + stage.private_ip_address + ":80 " +
-                                            " -L 2224:" + prod1.private_ip_address + ":22 -L 8084:" + prod1.private_ip_address + ":80 " +
-                                            " -L 2225:" + prod2.private_ip_address + ":22 -L 8085:" + prod2.private_ip_address + ":80 " +
-                                            " -L 2226:" + prod1dc2.private_ip_address + ":22 -L 8086:" + prod1dc2.private_ip_address + ":80 " +
-                                            " -L 2227:" + mysql1.private_ip_address + ":22 "
-                                            " -L 2228:" + client2.private_ip_address + ":22 -L 8088:" + client2.private_ip_address + ":80 " +
+                                            " -L 2221:" + dev.private_ip_address + ":22 -L 8081:" + dev.private_ip_address + ":80 " +
+                                            " -L 2222:" + stage.private_ip_address + ":22 -L 8082:" + stage.private_ip_address + ":80 " +
+                                            " -L 2223:" + prod1.private_ip_address + ":22 -L 8083:" + prod1.private_ip_address + ":80 " +
+                                            " -L 2224:" + prod2.private_ip_address + ":22 -L 8084:" + prod2.private_ip_address + ":80 " +
+                                            " -L 2225:" + prod1dc2.private_ip_address + ":22 -L 8085:" + prod1dc2.private_ip_address + ":80 " +
+                                            " -L 2226:" + mysql1.private_ip_address + ":22 "
+                                            " -L 2227:" + client2.private_ip_address + ":22 -L 8087:" + client2.private_ip_address + ":80 " +
                                             ";ssh-keygen -f ~/.ssh/known_hosts -R "+ elasticip.public_ip)
 print("Dev:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2221;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2221 -i " + KEY_FILE)
 print("Stage:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2222;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2222 -i " + KEY_FILE)
 print("Prod1:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2223;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2223 -i " + KEY_FILE)
 print("Prod2: ")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2224;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2224 -i " + KEY_FILE)
 print("Prod1 at dc2:") 
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2225;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2225 -i " + KEY_FILE)
 print("Mysql1:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2226;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2226 -i " + KEY_FILE)
 print("Client2:")
-print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2228;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2228 -i " + KEY_FILE)
+print("ssh-keygen -f ~/.ssh/known_hosts -R [localhost]:2227;ssh -o \"StrictHostKeyChecking no\" ubuntu@localhost -p 2227 -i " + KEY_FILE)
 
 
